@@ -1,6 +1,7 @@
-import django.conf.urls
+from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    django.conf.urls.url(r'^$', views.post_list, name='post_list'),
+    url(r'^$', views.post_list, name='post_list'),
+    url(r'^post/(?P<pk>\d+)/$', views.post_detail, name='post_detail'),
 ]
