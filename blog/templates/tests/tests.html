@@ -1,0 +1,8 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+    <ul>
+    {% for test in tests %}
+        <li><a href="{% url 'test' pk=test.pk %}">{{ test }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

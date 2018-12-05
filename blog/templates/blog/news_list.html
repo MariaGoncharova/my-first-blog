@@ -1,0 +1,17 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Новости{% endblock %}
+
+{% block content %}
+    {% for post in posts %}
+        <div class="news-list">
+            <div class="news-preview">
+                <a href="{% url 'post_detail' pk=post.pk %}" class="news-preview-title">{{ post.title }} </a>
+                <p class="news-preview-date">{{ post.created_date }}</p>
+                <p class="news-preview-description">{{ post.text|linebreaksbr }}</p> {% comment %}Description{% endcomment %}
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock content%}
+
