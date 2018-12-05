@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import Textarea
 
 from .models import Post, Comment
 
@@ -13,6 +14,12 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['text']
+        widgets = {
+            'text': Textarea(attrs={
+                'class': 'form-control',
+                'cols': 80, 'rows': 3,
+            }),
+        }
 
 
 FAVORITE_COLORS_CHOICES = (

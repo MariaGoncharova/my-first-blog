@@ -11,10 +11,11 @@ def post_list(request):
 
 
 def post_detail(request, pk):
+    form = CommentForm()
     post = get_object_or_404(Post, pk=pk)
     return render(request, 'blog/news_page.html', {
         'post': post,
-        'create_comment_form': CommentForm(),
+        'form': form
     })
 
 
@@ -102,23 +103,51 @@ def post_remove(request, pk):
 @login_required
 def create_comment(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    form = CommentForm(request.POST)
-    if form.is_valid():
-        comment = form.save(commit=False)
-        comment.author = request.user
-        comment.post_pk = pk
-        comment.save()
-    return redirect('blog/news_page.html', pk)
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.author = request.user
+            comment.post = post
+            comment.save()
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = CommentForm()
+    return render(request, 'blog/news_page.html', {'form': form})
 
-@login_required
-def profile(request, pk):
-    user = get_object_or_404(User, username=username)
-    tests = Test.objects.all()
-    return render(request, 'profile.html', {
-        'user': user,
-        'tests': tests.filter(assignee=user),
-    })
+# post = get_object_or_404(Post, pk=pk)
+# form = CommentForm(request.POST)
+#
+# if form.is_valid():
+#     comment = form.save(commit=False)
+#
+#     comment.post = post
+#     comment.save()
+# return redirect('post_detail', pk=post.pk)
 
+# @login_required
+# def create_comment(request, pk):
+#     post = get_object_or_404(Post, pk=pk)
+#     if request.method == "POST":
+#         form = CommentForm(request.POST)
+#         if form.is_valid():
+#             comment = form.save(commit=False)
+#             comment.post = post
+#             comment.save()
+#             return redirect('post_detail', pk=post.pk)
+#     else:
+#         form = CommentForm()
+#     return render(request, 'blog/add_comment_to_post.html', {'form': form})
+
+# @login_required
+# def profile(request, pk):
+#     user = get_object_or_404(User, username=username)
+#     tests = Test.objects.all()
+#     return render(request, 'profile.html', {
+#         'user': user,
+#         'tests': tests.filter(assignee=user),
+#     })
+#
 
 # def add_comment_to_post(request, pk):
 #     post = get_object_or_404(Post, pk=pk)
@@ -133,5 +162,3 @@ def profile(request, pk):
 #         form = CommentForm()
 #     return render(request, 'blog/add_comment_to_post.html', {'form': form})
 # Create your views here.
-
-

@@ -14,5 +14,5 @@ urlpatterns = [
     url(r'^tests$', views.tests, name='tests'),
     url(r'^test/(?P<pk>\d+)$', views.test, name='test'),
 
-    url(r'^profile/(?P<username>[0-9A-Za-z_]+)/$', views.profile, name='profile'),
+    # url(r'^profile/(?P<username>[0-9A-Za-z_]+)/$', views.profile, name='profile'),
 ]

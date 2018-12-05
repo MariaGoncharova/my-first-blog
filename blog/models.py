@@ -36,7 +36,6 @@ class Comment(models.Model):
     def __str__(self):
         return self.text
 
-
 class Variant(models.Model):
     description = models.TextField()
 

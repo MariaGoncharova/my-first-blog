@@ -11,13 +11,13 @@
             <p class="news-page-text">{{ post.text }}</p>
         </div>
         <div class="news-comment">
-            <form method="POST"  action="{% url 'create_comment' pk=post.pk %}">
+            <form method="POST" action="{% url 'create_comment' pk=post.pk %}">
                 <div class="form-group">
                     <label for="exampleFormControlTextarea1" class="news-comment-title">Комментарии</label>
-                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
                     {% csrf_token %}
                     {{ form.text }}
                 </div>
+
                 <input type="submit" class="btn btn-primary mr-2 news-comments-button" value="Отправить">
             </form>
 
@@ -28,13 +28,6 @@
                 </div>
 
             {% endfor %}
-
         </div>
-
     </div>
-    <form method="POST" class="post-form">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="save btn btn-default">Отправить</button>
-    </form>
 {% endblock %}
