@@ -50,6 +50,9 @@ class Question(models.Model):
 
     variants = models.ManyToManyField(Variant)
 
+    def is_right(self, answer):
+        return self.right_answer.description == answer
+
     def __str__(self):
         return self.title
 

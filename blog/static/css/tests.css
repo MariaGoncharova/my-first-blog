@@ -1,0 +1,19 @@
+.tests-list {
+    margin-top: 50px;
+}
+
+.tests-list-title {
+    color: #07689F;
+    font-size: 25px;
+}
+
+.tests-preview {
+    width: 740px;
+    margin: 0 auto;
+}
+
+.tests-preview-title {
+    font-size: 20px;
+    text-decoration: none !important;
+}
+

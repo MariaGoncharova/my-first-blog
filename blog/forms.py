@@ -30,7 +30,7 @@ FAVORITE_COLORS_CHOICES = (
 
 
 def get_choices(variants):
-    ch = tuple([(i, variant.description) for i, variant in enumerate(variants)])
+    ch = tuple([(variant.description, variant.description) for i, variant in enumerate(variants)])
     return ch
 
 

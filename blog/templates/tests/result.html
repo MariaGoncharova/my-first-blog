@@ -1,0 +1,31 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Новости{% endblock %}
+
+{% block content %}
+
+    <div id="myModal" class="modal d-block position-relative" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body" align="center">
+                    <p class="tests-list-title">Ваш результат {{ rights }} из {{ total }}</p>
+                    <p class="tests-list-title">Процент правильных ответов: {{ procent }}%</p>
+
+                    {% if procent > 70 %}
+                        <p class="tests-list-title">Зачёт</p>
+                    {% else %}
+                        <p class="tests-list-title">(Не зачет)</p>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <a href="{% url 'tests' %}" class="btn btn-primary align-bottom mr-1" align="center">Назад</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock content %}
+

@@ -1,3 +1,5 @@
+from functools import reduce
+
 from django.utils import timezone
 from .models import Post, Test
 from django.shortcuts import render, get_object_or_404, redirect
@@ -27,12 +29,27 @@ def tests(request):
 def test(request, pk):
     test = get_object_or_404(Test, pk=pk)
     if request.method == "POST":
-        pass
+        count_of_answer = 0
+        for post_keys in request.POST.keys():
+            if 'variants' in post_keys:
+                count_of_answer += 1
+
+        questions = test.questions.order_by('pk').all()
+        answers = []
+        for i, question in enumerate(questions):
+            answers.append(question.is_right(request.POST.get('variants_{i}'.format(i=i))))
+        rights = 0
+        for item in answers:
+            if item:
+                rights += 1
+
+        return render(request, 'tests/result.html', {'rights': rights, 'total': len(answers), 'procent': int(rights / len(answers) * 100)})
+
     else:
         forms = []
-        for i, question in enumerate(test.questions.all()):
+        for i, question in enumerate(test.questions.order_by('pk').all()):
             label = question.description
-            var = question.variants.all()
+            var = question.variants.order_by('pk').all()
             forms.append(TestForm(label=label, variants=var, i=i))
     return render(request, 'tests/test.html', {'test': test, 'forms': forms})
 
