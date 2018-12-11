@@ -18,29 +18,23 @@ def post_detail(request, pk):
         'form': form
     })
 
-
+@login_required
 def tests(request):
     tests = Test.objects.all()
     return render(request, 'tests/tests.html', {'tests': tests})
 
-
+@login_required
 def test(request, pk):
     test = get_object_or_404(Test, pk=pk)
     if request.method == "POST":
         pass
-        # form = PostForm(request.POST, instance=post)
-        # if form.is_valid():
-        #     post = form.save(commit=False)
-        #     post.author = request.user
-        #
-        #     post.save()
-        #     return redirect('postst_detail', pk=post.pk)
     else:
-        form = TestForm()
-
-    # return render(request, 'blog/post_edit.html', {'form': form})
-
-    return render(request, 'tests/test.html', {'test': test, 'form': form})
+        forms = []
+        for i, question in enumerate(test.questions.all()):
+            label = question.description
+            var = question.variants.all()
+            forms.append(TestForm(label=label, variants=var, i=i))
+    return render(request, 'tests/test.html', {'test': test, 'forms': forms})
 
 
 @login_required
@@ -50,7 +44,6 @@ def post_new(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-
             post.save()
             return redirect('post_detail', pk=post.pk)
     else:

@@ -8,7 +8,7 @@
             <div class="news-preview">
                 <a href="{% url 'post_detail' pk=post.pk %}" class="news-preview-title">{{ post.title }} </a>
                 <p class="news-preview-date">{{ post.created_date }}</p>
-                <p class="news-preview-description">{{ post.text|linebreaksbr }}</p> {% comment %}Description{% endcomment %}
+                <p class="news-preview-description">{{ post.news_description|linebreaksbr }}</p> {% comment %}Description{% endcomment %}
             </div>
         </div>
     {% endfor %}

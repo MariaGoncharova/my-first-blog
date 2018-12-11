@@ -2,7 +2,12 @@
 {% block content %}
     {{ test }}
     <form method="POST" class="post-form">{% csrf_token %}
-        {{ form.as_p }}
+        {% for form in forms %}
+            {{ form.as_p }}
+            <hr>
+        {% endfor %}
+
         <button type="submit" class="save btn btn-default">Сохранить</button>
     </form>
 {% endblock %}
+

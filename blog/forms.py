@@ -29,9 +29,20 @@ FAVORITE_COLORS_CHOICES = (
 )
 
 
+def get_choices(variants):
+    ch = tuple([(i, variant.description) for i, variant in enumerate(variants)])
+    return ch
+
+
 class TestForm(forms.Form):
-    variants = forms.MultipleChoiceField(
-        required=False,
-        widget=forms.RadioSelect,
-        choices=FAVORITE_COLORS_CHOICES,
-    )
+
+    def __init__(self, label, variants, i, *args, **kwarg):
+        super(TestForm, self).__init__(*args, **kwarg)
+        self.fields[f'variants_{i}'] = forms.MultipleChoiceField(
+            label=label,
+            required=True,
+            widget=forms.RadioSelect,
+            choices=get_choices(variants),
+        )
+
+
