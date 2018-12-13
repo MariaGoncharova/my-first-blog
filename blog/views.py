@@ -20,10 +20,12 @@ def post_detail(request, pk):
         'form': form
     })
 
+
 @login_required
 def tests(request):
     tests = Test.objects.all()
     return render(request, 'tests/tests.html', {'tests': tests})
+
 
 @login_required
 def test(request, pk):
@@ -33,7 +35,6 @@ def test(request, pk):
         for post_keys in request.POST.keys():
             if 'variants' in post_keys:
                 count_of_answer += 1
-
         questions = test.questions.order_by('pk').all()
         answers = []
         for i, question in enumerate(questions):
@@ -43,7 +44,8 @@ def test(request, pk):
             if item:
                 rights += 1
 
-        return render(request, 'tests/result.html', {'rights': rights, 'total': len(answers), 'procent': int(rights / len(answers) * 100)})
+        return render(request, 'tests/result.html',
+                      {'rights': rights, 'total': len(answers), 'procent': int(rights / len(answers) * 100)})
 
     else:
         forms = []
