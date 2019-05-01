@@ -25,7 +25,7 @@ SECRET_KEY = 'wmrz)xpsr_sxe*@(vi1(jcu!24uvau0vaom51=hum^0620g)@z'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'mariaGnchrv.pythonanywhere.com']
+ALLOWED_HOSTS = ['*']
 
 LOGIN_REDIRECT_URL = '/'
 

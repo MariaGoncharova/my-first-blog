@@ -46,7 +46,7 @@ class Variant(models.Model):
 class Question(models.Model):
     title = models.CharField(max_length=128, null=True, blank=True)
     description = models.TextField()
-    right_answer = models.ForeignKey(Variant, related_name='right')
+    right_answer = models.ForeignKey(Variant, related_name='right', on_delete=models.CASCADE)
 
     variants = models.ManyToManyField(Variant)
 
