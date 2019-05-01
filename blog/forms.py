@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import Textarea
 
+from blog.constants import TestType
 from .models import Post, Comment
 
 
@@ -36,13 +37,16 @@ def get_choices(variants):
 
 class TestForm(forms.Form):
 
-    def __init__(self, label, variants, i, *args, **kwarg):
+    def __init__(self, label, i, test_type=TestType.CLOSE, variants=None, *args, **kwarg):
         super(TestForm, self).__init__(*args, **kwarg)
-        self.fields[f'variants_{i}'] = forms.MultipleChoiceField(
-            label=label,
-            required=True,
-            widget=forms.RadioSelect,
-            choices=get_choices(variants),
-        )
+        if test_type == TestType.CLOSE:
+            self.fields[f'variants_{i}'] = forms.MultipleChoiceField(
+                label=label,
+                required=True,
+                widget=forms.RadioSelect,
+                choices=get_choices(variants),
+            )
+        else:
+            self.fields[f'variants_{i}'] = forms.CharField(widget=forms.Textarea)
 
 
