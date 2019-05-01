@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, User
 from django.db import models
 from django.utils import timezone
 
@@ -36,6 +36,7 @@ class Comment(models.Model):
     def __str__(self):
         return self.text
 
+
 class Variant(models.Model):
     description = models.TextField()
 
@@ -65,3 +66,16 @@ class Test(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class UserAnswer(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    variant = models.ForeignKey(Variant, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class Attempt(models.Model):
+    passage_date = models.DateTimeField(default=timezone.now)
+    test = models.ForeignKey(Test, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_answer = models.ManyToManyField(UserAnswer)
