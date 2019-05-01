@@ -1,7 +1,7 @@
 from functools import reduce
 
 from django.utils import timezone
-from .models import Post, Test
+from .models import Post, Test, Attempt, Variant
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import PostForm, CommentForm, TestForm
 from django.contrib.auth.decorators import login_required
@@ -30,29 +30,35 @@ def tests(request):
 @login_required
 def test(request, pk):
     test = get_object_or_404(Test, pk=pk)
-    if request.method == "POST":
-        count_of_answer = 0
-        for post_keys in request.POST.keys():
-            if 'variants' in post_keys:
-                count_of_answer += 1
+    if request.method == 'POST':
+        user = request.user
+
         questions = test.questions.order_by('pk').all()
         answers = []
-        for i, question in enumerate(questions):
-            answers.append(question.is_right(request.POST.get('variants_{i}'.format(i=i))))
-        rights = 0
-        for item in answers:
-            if item:
-                rights += 1
 
-        return render(request, 'tests/result.html',
-                      {'rights': rights, 'total': len(answers), 'procent': int(rights / len(answers) * 100)})
+        attempt = Attempt.objects.create(test=test, user=user)
+
+        for i, question in enumerate(questions):
+            description = request.POST.get(f'variants_{i}')
+            answers.append(question.is_right(description))
+
+            variant = Variant.objects.filter(description=description).first()
+            attempt.user_answer.create(question=question, user=user, variant=variant)
+
+        rights = answers.count(True)
+
+        return render(
+            request,
+            'tests/result.html',
+            {'rights': rights, 'total': len(answers), 'procent': int(rights / len(answers) * 100)}
+        )
 
     else:
         forms = []
         for i, question in enumerate(test.questions.order_by('pk').all()):
             label = question.description
-            var = question.variants.order_by('pk').all()
-            forms.append(TestForm(label=label, variants=var, i=i))
+            variants = question.variants.order_by('pk').all()
+            forms.append(TestForm(label=label, variants=variants, i=i))
     return render(request, 'tests/test.html', {'test': test, 'forms': forms})
 
 

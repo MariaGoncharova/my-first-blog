@@ -73,9 +73,16 @@ class UserAnswer(models.Model):
     variant = models.ForeignKey(Variant, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f'Question: {self.question}, User: {self.user}, Variant: {self.variant}'
+
 
 class Attempt(models.Model):
     passage_date = models.DateTimeField(default=timezone.now)
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     user_answer = models.ManyToManyField(UserAnswer)
+
+    def __str__(self):
+        user_answer = list(map(lambda item: str(item), self.user_answer.values()))
+        return f'Test: {self.test}, User: {self.user}, Answer: {user_answer}'
