@@ -51,6 +51,7 @@ class Variant(models.Model):
         return self.description
 
 
+# Закртый вопрос
 class Question(models.Model):
     title = models.CharField(max_length=128, null=True, blank=True)
     description = models.TextField()
@@ -72,6 +73,7 @@ class Question(models.Model):
         return self.title
 
 
+# Открытый вопрос
 class OpenQuestion(models.Model):
     title = models.CharField(max_length=128, null=True, blank=True)
     description = models.TextField()
@@ -87,6 +89,7 @@ class OpenQuestion(models.Model):
 
 
 class StoreQuestion(models.Model):
+    # открытый или закрытый вопрос
     test_type = models.CharField(max_length=128, choices=TEST_TYPE, default=TestType.CLOSE.value)
 
     close_question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True, blank=True)
