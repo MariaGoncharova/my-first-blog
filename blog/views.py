@@ -1,7 +1,10 @@
 from functools import reduce
 
 from django.utils import timezone
-from .models import Post, Test, Attempt, Variant
+
+from blog.constants import TestType
+from blog.utils import get_id_for_form_fields
+from .models import Post, Test, Attempt, Variant, StoreQuestion, StoreAnswer
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import PostForm, CommentForm, TestForm
 from django.contrib.auth.decorators import login_required
@@ -33,32 +36,33 @@ def test(request, pk):
     if request.method == 'POST':
         user = request.user
 
-        questions = test.questions.order_by('pk').all()
-        answers = []
+        questions: StoreQuestion = test.questions.order_by('pk').all()
 
         attempt = Attempt.objects.create(test=test, user=user)
 
-        for i, question in enumerate(questions):
-            description = request.POST.get(f'variants_{i}')
-            answers.append(question.is_right(description))
+        for store_question in questions:
+            description = request.POST.get(get_id_for_form_fields(store_question.test_type, store_question.pk))
 
-            variant = Variant.objects.filter(description=description).first()
-            attempt.user_answer.create(question=question, user=user, variant=variant)
+            if store_question.test_type == TestType.CLOSE.value:
+                variant = Variant.objects.filter(description=description).first()
+                store_answer = StoreAnswer.create_answer(store_question.test_type, variant)
+            elif store_question.test_type == TestType.OPEN.value:
+                store_answer = StoreAnswer.create_answer(store_question.test_type, description)
 
-        rights = answers.count(True)
+            attempt.user_answer.create(question=store_question, answer=store_answer, user=user)
+
+        attempt.save()
 
         return render(
             request,
             'tests/result.html',
-            {'rights': rights, 'total': len(answers), 'procent': int(rights / len(answers) * 100)}
+            {'rights': 1, 'total': 1, 'procent': 1}
         )
 
     else:
         forms = []
-        for i, question in enumerate(test.questions.order_by('pk').all()):
-            label = question.description
-            variants = question.variants.order_by('pk').all()
-            forms.append(TestForm(label=label, variants=variants, i=i))
+        for store_question in test.questions.order_by('pk').all():
+            forms.append(store_question.create_question())
     return render(request, 'tests/test.html', {'test': test, 'forms': forms})
 
 

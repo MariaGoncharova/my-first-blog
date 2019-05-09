@@ -2,6 +2,7 @@ from django import forms
 from django.forms import Textarea
 
 from blog.constants import TestType
+from blog.utils import get_id_for_form_fields
 from .models import Post, Comment
 
 
@@ -40,13 +41,11 @@ class TestForm(forms.Form):
     def __init__(self, label, i, test_type=TestType.CLOSE, variants=None, *args, **kwarg):
         super(TestForm, self).__init__(*args, **kwarg)
         if test_type == TestType.CLOSE:
-            self.fields[f'variants_{i}'] = forms.MultipleChoiceField(
+            self.fields[get_id_for_form_fields(TestType.CLOSE, i)] = forms.MultipleChoiceField(
                 label=label,
                 required=True,
                 widget=forms.RadioSelect,
                 choices=get_choices(variants),
             )
-        else:
-            self.fields[f'variants_{i}'] = forms.CharField(widget=forms.Textarea)
-
-
+        elif test_type == TestType.OPEN:
+            self.fields[get_id_for_form_fields(TestType.OPEN, i)] = forms.CharField(widget=forms.Textarea, label=label)
