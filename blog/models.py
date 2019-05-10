@@ -2,11 +2,16 @@ from django.contrib.auth.models import AbstractUser, User
 from django.db import models
 from django.utils import timezone
 
-from blog.constants import TestType
+from blog.constants import TestType, AttemptStatus
 
 TEST_TYPE = (
     (TestType.CLOSE.value, TestType.CLOSE.value),
     (TestType.OPEN.value, TestType.OPEN.value),
+)
+ATTEMPT_STATUS = (
+    (AttemptStatus.PASSED.value, AttemptStatus.PASSED.value),
+    (AttemptStatus.NOT_PASSED.value, AttemptStatus.NOT_PASSED.value),
+    (AttemptStatus.PENDING.value, AttemptStatus.PENDING.value),
 )
 
 
@@ -67,7 +72,7 @@ class Question(models.Model):
         return TestForm(label=label, variants=variants, i=i)
 
     def is_right(self, answer):
-        return self.right_answer.description == answer
+        return self.right_answer == answer
 
     def __str__(self):
         return self.title
@@ -103,6 +108,15 @@ class StoreQuestion(models.Model):
 
         return question_form
 
+    def get_question(self):
+        question = None
+        if self.test_type == TestType.CLOSE.value:
+            question = self.close_question
+        elif self.test_type == TestType.OPEN.value:
+            question = self.open_question
+
+        return self.test_type, question
+
     def __str__(self):
         return f'Type: {self.test_type} -> close: {self.close_question}, open: {self.open_question}'
 
@@ -137,6 +151,15 @@ class StoreAnswer(models.Model):
 
         return store_answer
 
+    def get_answer(self):
+        answer = None
+        if self.test_type == TestType.CLOSE.value:
+            answer = self.close_answer
+        elif self.test_type == TestType.OPEN.value:
+            answer = self.open_answer
+
+        return self.test_type, answer
+
     def __str__(self):
         if self.test_type == TestType.CLOSE.value:
             answer = self.close_answer
@@ -150,9 +173,10 @@ class UserAnswer(models.Model):
     answer = models.ForeignKey(StoreAnswer, on_delete=models.CASCADE)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=128, choices=ATTEMPT_STATUS, default=AttemptStatus.PENDING.value)
 
     def __str__(self):
-        return f'Question: {self.question}, User: {self.user} Answer: {self.answer}'
+        return f'Question: {self.question}, User: {self.user} Answer: {self.answer} Status: {self.status}'
 
 
 class Attempt(models.Model):
@@ -161,6 +185,20 @@ class Attempt(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     user_answer = models.ManyToManyField(UserAnswer)
 
+    status = models.CharField(max_length=128, choices=ATTEMPT_STATUS, default=AttemptStatus.PENDING.value)
+
     def __str__(self):
         user_answer = list(map(lambda item: str(item), self.user_answer.values()))
-        return f'Test: {self.test}, User: {self.user}, Answer: {user_answer}'
+        return f'Test: {self.test}, User: {self.user}, Answer: {user_answer} Status: {self.status}'
+
+    def resolve_attempt(self):
+        user_answers = self.user_answer.all()
+        right_answer = user_answers.filter(status=AttemptStatus.PASSED.value)
+        pending = user_answers.filter(status=AttemptStatus.PENDING.value)
+
+        if len(right_answer) == len(user_answers):
+            self.status = AttemptStatus.PASSED
+            self.save()
+        elif len(pending) == 0:
+            self.status = AttemptStatus.NOT_PASSED
+            self.save()

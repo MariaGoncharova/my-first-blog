@@ -1,0 +1,13 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Список пользователей{% endblock %}
+
+{% block content %}
+
+    <div>
+    {% for user in users %}
+        <a href="{% url 'user-tests' user=user.pk %}" class="tests-preview-title">{{ user }} </a></br>
+    {% endfor %}
+    </div>
+
+{% endblock %}

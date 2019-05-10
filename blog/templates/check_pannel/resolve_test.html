@@ -1,0 +1,17 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+    <div class="tests-list">
+        <div class="news-preview">
+            <form method="POST" class="post-form">
+                {% csrf_token %}
+                {% for form in forms %}
+                    {{ form.as_p }}
+                    <hr>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary mr-2 news-comments-button">Сохранить</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+

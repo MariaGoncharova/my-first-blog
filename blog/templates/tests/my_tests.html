@@ -1,0 +1,18 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Тесты{% endblock %}
+
+{% block content %}
+
+    <div class="tests-list">
+        <div class="news-preview">
+            <p class="tests-list-title">Ваши попытки</p>
+            {% for attempt in attempts %}
+{#              <a href="{% url 'attempt' pk=attempt.pk %}" class="tests-preview-title">{{ attempt }} </a></br>#}
+                <p>Test: {{ attempt.test }} Date: {{ attempt.passage_date }} Status: {{ attempt.status }}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+
+{% endblock %}

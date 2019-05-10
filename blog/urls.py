@@ -11,8 +11,13 @@ urlpatterns = [
     url(r'^post/(?P<pk>\d+)/remove/', views.post_remove, name='post_remove'),
     # url(r'^post/(?P<pk>\d+)/comment/$', views.add_comment_to_post, name='add_comment_to_post'),
     url(r'^post/(?P<pk>\d+)/comment/$', views.create_comment, name='create_comment'),
-    url(r'^tests$', views.tests, name='tests'),
-    url(r'^test/(?P<pk>\d+)$', views.test, name='test'),
+    url(r'^tests$', views.tests_list, name='tests'),
+    url(r'^test/(?P<pk>\d+)$', views.render_test, name='test'),
+    url(r'^my-tests/$', views.get_my_tests, name='my_tests'),
+
+    url(r'^check-pannel/user-list$', views.get_user_list, name='user_lists'),
+    url(r'^check-pannel/user-tests/(?P<user>\d+)/$', views.get_user_tests, name='user-tests'),
+    url(r'^check-pannel/resolve-test/(?P<attempt>\d+)/$', views.resolve_test, name='resolve-test'),
 
     # url(r'^profile/(?P<username>[0-9A-Za-z_]+)/$', views.profile, name='profile'),
 ]

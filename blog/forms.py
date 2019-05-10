@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import Textarea
 
-from blog.constants import TestType
+from blog.constants import TestType, AttemptStatus
 from blog.utils import get_id_for_form_fields
 from .models import Post, Comment
 
@@ -49,3 +49,18 @@ class TestForm(forms.Form):
             )
         elif test_type == TestType.OPEN:
             self.fields[get_id_for_form_fields(TestType.OPEN, i)] = forms.CharField(widget=forms.Textarea, label=label)
+
+
+class CheckOpenQuestionForm(forms.Form):
+
+    def __init__(self, label, i, *args, **kwarg):
+        super(CheckOpenQuestionForm, self).__init__(*args, **kwarg)
+        self.fields[i] = forms.MultipleChoiceField(
+            label=label,
+            required=True,
+            widget=forms.RadioSelect,
+            choices=(
+                (AttemptStatus.PASSED.value, AttemptStatus.PASSED.value),
+                (AttemptStatus.NOT_PASSED.value, AttemptStatus.NOT_PASSED.value),
+            ),
+        )
