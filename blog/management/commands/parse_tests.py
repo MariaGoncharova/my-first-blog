@@ -13,14 +13,14 @@ token_file = 'diplomaproject-240220-d0d65406fe9d.json'
 class Command(BaseCommand):
 
     @staticmethod
-    def download_question(question_type, sheet):
+    def download_questions(question_type, sheet):
         worksheet = sheet.worksheet(question_type)
         list_of_questions = worksheet.get_all_values()
         list_of_questions.pop(0)
         return list_of_questions
 
     @staticmethod
-    def make_closed_questions(self, list_of_questions):
+    def make_closed_questions(list_of_questions):
         closed_question = Question
         closed_questions_store = StoreQuestion
         for row in list_of_questions:
@@ -40,9 +40,9 @@ class Command(BaseCommand):
         google_client = gspread.authorize(credentials)
         google_table = google_client.open_by_key(document)
         parser = Command
-        closed_questions = parser.downloadQuestions(closed_questions_sheet, google_table)
-        open_questions = parser.downloadQuestions(open_questions_sheet, google_table)
-        parser.makeOpenQuestions(open_questions)
-        parser.makeClosedQuestions(closed_questions)
+        closed_questions = parser.download_questions(closed_questions_sheet, google_table)
+        open_questions = parser.download_questions(open_questions_sheet, google_table)
+        parser.make_open_questions(open_questions)
+        parser.make_closed_questions(closed_questions)
 
 
