@@ -118,7 +118,8 @@ class StoreQuestion(models.Model):
         return self.test_type, question
 
     def __str__(self):
-        return f'Type: {self.test_type} -> close: {self.close_question}, open: {self.open_question}'
+        question = self.close_question or self.open_question
+        return f'Type: {self.test_type} ;;;;;;; Question: {question}'
 
 
 class Test(models.Model):
