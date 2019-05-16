@@ -1,3 +1,77 @@
-{#{% extends "base.html" %}#}
-{##}
-{#{% block title %}{{ user }}{% endblock %}#}
+{% extends "blog/base.html" %}
+
+{% block title %}Профиль{% endblock %}
+
+{% block content %}
+
+    <div class="content-profile-wrapper">
+        <div class="user_profile">
+            <div class="user_profile_info_user">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="user_profile__fio_user">
+                            <p class="user_profile__full_name">
+                                {{ user.first_name }} {{ user.last_name }}
+                            </p>
+                            <p class="user_profile__email">{{ user.email }}</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6  user_profile_avatar_block">
+                        {% if user.profile.avatar %}
+                            <div class="user_profile__info_user">
+
+                                <img src="{{ MEDIA_URL }}{{ user.profile.avatar.url }}" href="" width="150" height="150"
+                                     class="user_profile_avatar rounded-circle" alt="Аватар">
+                                {% else %}
+                                <img src="\media\avatars\noname.png" width="150" height="150"
+                                     class="user_profile_avatar">
+
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6 user_profile__user_tests">
+                    <table class="table table-borderless table-sm">
+                        {% for attempt in attempts %}
+                            <tbody>
+                            <tr>
+                                <td>{{ attempt.test }}</td>
+                                <td>{{ attempt.passage_date }}</td>
+                                <td>{{ attempt.status }}</td>
+                            </tr>
+                            </tbody>
+                        {% endfor %}
+                    </table>
+
+                </div>
+
+                        <div class="col-sm-6 user_profile__user_personals">
+                            <table class="table table-borderless table-sm">
+                                <tbody>
+                                <tr>
+                                    <td>Дата рождения</td>
+                                    <td>{{ user.profile.date_of_birth }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Телефон</td>
+                                    <td>{{ user.profile.phone_number }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Медицинская справка</td>
+                                    <td>{{ user.profile.medical_certificate }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Инструктор</td>
+                                    <td>{{ user.profile.instructor }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock content %}

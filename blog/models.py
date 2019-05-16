@@ -202,3 +202,24 @@ class Attempt(models.Model):
         elif len(pending) == 0:
             self.status = AttemptStatus.NOT_PASSED
             self.save()
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    instructor = models.CharField(max_length=50, null=True, blank=True, verbose_name='Инструктор')
+    date_of_birth = models.DateField(null=True, blank=True, verbose_name='Дата рождения')
+
+    phone_number = models.CharField(max_length=17, null=True, blank=True, verbose_name='Номер телефона')
+    medical_certificate = models.BooleanField(default=False, blank=True, verbose_name='Медицинская справка')
+
+    avatar = models.ImageField(
+        upload_to='avatars/',
+        null=True,
+        blank=True,
+        verbose_name='аватар',
+
+    )
+
+    def __str__(self):
+        return f'User: {self.user}, instructor: {self.instructor}'
+#     почему не могу убрать после запятой юзера?

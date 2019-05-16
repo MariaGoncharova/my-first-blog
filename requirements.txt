@@ -2,3 +2,5 @@ Django==2.0.6
 pytz==2019.1
 sqlparse==0.3.0
 views==0.3
+Pillow==5.4.1
+psycopg2==2.7.7

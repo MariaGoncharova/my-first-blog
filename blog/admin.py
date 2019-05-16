@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import Post, Comment, Test, Question, Variant, UserAnswer, Attempt, StoreQuestion, OpenQuestion, \
-    StoreAnswer
+    StoreAnswer, Profile
 
 admin.site.register(Post)
 admin.site.register(Comment)
@@ -14,3 +14,5 @@ admin.site.register(Attempt)
 admin.site.register(StoreQuestion)
 admin.site.register(OpenQuestion)
 admin.site.register(StoreAnswer)
+
+admin.site.register(Profile)

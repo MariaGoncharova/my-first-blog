@@ -1,4 +1,6 @@
 from django.conf.urls import url
+from django.urls import path
+
 from . import views
 
 urlpatterns = [
@@ -14,6 +16,8 @@ urlpatterns = [
     url(r'^tests$', views.tests_list, name='tests'),
     url(r'^test/(?P<pk>\d+)$', views.render_test, name='test'),
     url(r'^my-tests/$', views.get_my_tests, name='my_tests'),
+
+    # path('profile/', views.TestView, name='user_tests'),
 
     url(r'^check-pannel/user-list$', views.get_user_list, name='user_lists'),
     url(r'^check-pannel/user-tests/(?P<user>\d+)/$', views.get_user_tests, name='user-tests'),

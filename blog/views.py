@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import TemplateView
 
 from blog.constants import TestType, AttemptStatus
 from blog.utils import get_id_for_form_fields
@@ -105,7 +106,7 @@ def tests_list(request):
 @login_required
 def get_my_tests(request):
     attempts = Attempt.objects.filter(user=request.user)
-    return render(request, 'tests/my_tests.html', {'attempts': attempts})
+    return render(request, 'blog/profile.html', {'attempts': attempts})
 
 
 @login_required
@@ -185,3 +186,12 @@ def render_test(request, pk):
         for store_question in test.questions.order_by('pk').all():
             forms.append(store_question.create_question())
     return render(request, 'tests/test.html', {'test': test, 'forms': forms})
+
+
+class TestView(TemplateView):
+    template_name = 'blog/profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        return context

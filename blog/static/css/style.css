@@ -77,3 +77,8 @@
 .nav-element-user {
 	cursor: pointer;
 }
+
+.navbar-brand-logo{
+	margin-bottom: 5px;
+	margin-right: 17px;
+}

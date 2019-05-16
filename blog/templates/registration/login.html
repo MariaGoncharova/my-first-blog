@@ -3,18 +3,67 @@
 {% block title %}Вход{% endblock %}
 
 {% block content %}
-    {% if form.errors %}
-        <p>Ваши имя и пароль не распознаны. Пожалуйста, попробуйте еще раз</p>
-    {% endif %}
+{#    <form method="post" action="{% url 'login' %}">#}
+{#        {% csrf_token %}#}
+{##}
+{#        <div>#}
+{#            <td>{{ form.username.label_tag }}</td>#}
+{#            <td>{{ form.username }}</td>#}
+{#        </div>#}
+{#        <div>#}
+{#            <td>{{ form.password.label_tag }}</td>#}
+{#            <td>{{ form.password }}</td>#}
+{#        </div>#}
+{#        <div>#}
+{#            <input type="submit" value="login"/>#}
+{#            <input type="hidden" name="next" value="{{ next }}"/>#}
+{#        </div>#}
+{#    </form>#}
 
-    <div class="form form-signin">
+
+    <div id="myModal" class="modal d-block position-relative" tabindex="-1" role="dialog" aria-hidden="true">
+
+        <div class="modal-dialog">
+            <form action="{% url 'login' %}" method="POST">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Авторизация</h3>
+
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-md-4">
+                            <input class="form-control" type="text" value="" >
+                            {% csrf_token %}
+                            {{ form.username }}
+{#                            {{ form.username }}#}
+                        </div>
+
+                        <div class="col-md-4">
+                            <input class="form-control" type="text" value="">
+                            {% csrf_token %}
+                            {{ form.password }}
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-lg btn-success btn-block" type="submit">Вход</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="form-signin">
         <p class="login-title">Вход</p>
         <form action="{% url 'login' %}" method="POST">
-            <input class="form-control" type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-            {{ form.as_p }}
+            <input class="form-control" type="hidden" name="csrfmiddlewaretoken">
+{#            {{ form.as_p }}#}
+            {{ form.username }}
+            {{ form.password }}
             {% csrf_token %}
             <button class="btn btn-lg btn-success btn-block" type="submit">Вход</button>
         </form>
     </div>
+
 {% endblock %}
 

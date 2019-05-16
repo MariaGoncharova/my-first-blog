@@ -1,0 +1,46 @@
+.user_profile__full_name {
+    font-size: 3.5rem;
+    font-weight: 300;
+    text-align: left;
+    padding-left: 10px;
+    margin-top: 30px;
+}
+
+.user_profile_logo {
+    font-size: 1.5rem;
+    font-weight: 300;
+    text-align: left;
+    padding-left: 10px;
+
+    margin-bottom: -0.3rem;
+
+}
+
+.user-list {
+    margin-top: 50px;
+}
+
+.user-preview {
+    width: 550px;
+    margin: 0 auto;
+}
+
+
+.user_profile__email {
+    color: #cccccc;
+    font-size: 16px;
+    padding-left: 10px;
+}
+
+
+.user_profile_avatar {
+    text-align: center;
+    margin-top: 15px;
+    margin-left: 100px;
+    margin-bottom: 20px;
+    border-radius: 50% !important;
+}
+
+.user_profile__user_personals {
+    padding-right: 150px;
+}
