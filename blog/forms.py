@@ -9,7 +9,9 @@ from .models import Post, Comment
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ('title', 'text')
+        fields = (
+            'title',
+            'text')
 
 
 class CommentForm(forms.ModelForm):
@@ -22,13 +24,6 @@ class CommentForm(forms.ModelForm):
                 'cols': 80, 'rows': 3,
             }),
         }
-
-
-FAVORITE_COLORS_CHOICES = (
-    (1, 1),
-    (2, 2),
-    (3, 3),
-)
 
 
 def get_choices(variants):

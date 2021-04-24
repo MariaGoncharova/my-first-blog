@@ -3,15 +3,16 @@
 {% block title %}Тесты{% endblock %}
 
 {% block content %}
-
     <div class="tests-list">
         <div class="news-preview">
             <p class="tests-list-title">Выберите тест из списка:</p>
             {% for test in tests %}
-              <a href="{% url 'test' pk=test.pk %}" class="tests-preview-title">{{ test }} </a></br>
+                <a href="{% url 'test' pk=test.pk %}" class="tests-preview-title">{{ test }} </a> <br>
             {% endfor %}
         </div>
     </div>
-
-
 {% endblock %}
+
+
+
+

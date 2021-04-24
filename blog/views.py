@@ -134,9 +134,10 @@ def resolve_test(request, attempt):
             question_type, question = user_answer.question.get_question()
             _, answer = user_answer.answer.get_answer()
             label = (
-                f'question -> {question};;;\n'
-                f'answer -> {answer}\n'
+                f'Вопрос -> {question.description};\n '
+                f'Ответ -> {answer}\n'
             )
+
             forms.append(CheckOpenQuestionForm(label=label, i=user_answer.pk))
 
         return render(request, 'check_pannel/resolve_test.html', {'forms': forms})
@@ -154,9 +155,7 @@ def render_test(request, pk):
     test = get_object_or_404(Test, pk=pk)
     if request.method == 'POST':
         user = request.user
-
         questions: StoreQuestion = test.questions.order_by('pk').all()
-
         attempt = Attempt.objects.create(test=test, user=user)
 
         for store_question in questions:

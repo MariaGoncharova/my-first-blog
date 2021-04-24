@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Post, Comment, Test, Question, Variant, UserAnswer, Attempt, StoreQuestion, OpenQuestion, \
+from .models import Post, Comment, Test, Question, Variant, UserAnswer, Attempt, StoreQuestion, OpenQuestion,\
     StoreAnswer, Profile
 
 admin.site.register(Post)

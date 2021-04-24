@@ -1,19 +1,47 @@
 {% extends 'blog/base.html' %}
 {% block content %}
-    <div class="tests-list">
-        <div class="news-preview">
-            <p class="tests-list-title">{{ test }}</p>
+        <div class="tests-list">
+            <div class="news-preview">
+                <p class="tests-list-title">{{ test }}</p>
 
-            <form method="POST" class="post-form">
-                {% csrf_token %}
-                {% for form in forms %}
-                    {{ form.as_p }}
-                    <hr>
-                {% endfor %}
-                <button type="submit" class="btn btn-primary mr-2 news-comments-button">Сохранить</button>
-            </form>
+                <form method="POST" class="post-form">
+                    {% csrf_token %}
+                    {% for form in forms %}
+                        {{ form.as_p }}
+                        <hr>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary mr-2 news-comments-button">Сохранить</button>
+                </form>
+            </div>
         </div>
-    </div>
+
+
+
+    {#    <div class="news-page-container">#}
+    {#        <div class="news-page">#}
+    {#            <a href="{% url 'post_detail' pk=post.pk %}" class="news-preview-title">{{ post.title }} </a>#}
+    {#            <p class="news-preview-date">{{ post.created_date }}</p>#}
+    {#        <img class="blog-page-image" src="{{ post.image.url }}">#}
+    {#            <p class="news-page-text">{{ post.text }}</p>#}
+    {#        </div>#}
+    {#        <div class="news-comment">#}
+    {#            <form method="POST" action="{% url 'create_comment' pk=post.pk %}">#}
+    {#                <div class="form-group">#}
+    {#                    <label for="exampleFormControlTextarea1" class="news-comment-title">Комментарии</label>#}
+    {#                    {% csrf_token %}#}
+    {#                    {{ form.text }}#}
+    {#                </div>#}
+    {#                <input type="submit" class="btn btn-primary mr-2 news-comments-button" value="Отправить">#}
+    {#            </form>#}
+    {##}
+    {#            {% for comment in post.comments.all %}#}
+    {#                <div class="news-comments">#}
+    {#                    <p class="news-comments-author">{{ comment.author }} </p>#}
+    {#                    <p class="news-comments-text">{{ comment.text }} </p>#}
+    {#                </div>#}
+    {#            {% endfor %}#}
+    {#        </div>#}
+    {#    </div>#}
 {% endblock %}
 
 

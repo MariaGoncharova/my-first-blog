@@ -28,7 +28,8 @@
         <a class="navbar-brand " href="/">
             {#            <img src="https://img.icons8.com/ultraviolet/50/000000/steering-wheel.png">#}
 
-           <p class="user_profile_logo "> <img class="navbar-brand-logo" src="/media/static/icons8-руль-36.png">За рулем</p>
+            <p class="user_profile_logo "><img class="navbar-brand-logo" src="/media/static/icons8-руль-36.png">За рулем
+            </p>
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02"
                 aria-expanded="false" aria-label="Toggle navigation">
@@ -41,13 +42,13 @@
                     {% if user.is_authenticated %}
                         <div class="nav-item dropdown">
                         <div class="btn-group mb-3 w-100">
-                            <button type="button" class="btn btn-primary btn-block" >{{ user.username }}</button>
+                            <button type="button" class="btn btn-primary btn-block">{{ user.username }}</button>
                             <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="{% url 'my_tests' %}">Профиль</a>
+                                <a class="dropdown-item" href="{% url 'my_tests' %}">Личный кабинет</a>
                                 <a class="dropdown-item" href="{% url 'tests' %}">Тесты</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="{% url 'logout' %}">Выход</a>
@@ -57,6 +58,7 @@
                     {% else %}
                         <a class="nav-link" href="{% url 'login' %}">Войти</a>
                     {% endif %}
+                    </div>
                 </li>
             </ul>
         </div>

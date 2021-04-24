@@ -16,15 +16,36 @@ ATTEMPT_STATUS = (
 
 
 class Post(models.Model):
-    author = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
-    text = models.TextField()
-    news_description = models.TextField(default='')
+    class Meta:
+        verbose_name = 'Новости'
+        verbose_name_plural = 'Новости'
+
+    author = models.ForeignKey(
+        'auth.User',
+        on_delete=models.CASCADE,
+        verbose_name='Автор'
+    )
+    title = models.CharField(
+        max_length=200,
+        verbose_name='Заголовок'
+    )
+    text = models.TextField(
+        verbose_name='Текст новости'
+    )
+    news_description = models.TextField(
+        default='',
+        verbose_name='Превью новости'
+    )
 
     created_date = models.DateTimeField(
-        default=timezone.now)
+        default=timezone.now,
+        verbose_name='Дата создания'
+    )
     published_date = models.DateTimeField(
-        blank=True, null=True)
+        blank=True,
+        null=True,
+        verbose_name='Дата публикации'
+    )
 
     def publish(self):
         self.published_date = timezone.now()
@@ -35,11 +56,30 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    post = models.ForeignKey('blog.Post', on_delete=models.CASCADE, related_name='comments')
-    author = models.CharField(max_length=200)
-    text = models.TextField()
-    created_date = models.DateTimeField(default=timezone.now)
-    approved_comment = models.BooleanField(default=False)
+    class Meta:
+        verbose_name = 'Комментарии'
+        verbose_name_plural = 'Комментарии'
+
+    post = models.ForeignKey(
+        'blog.Post',
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    author = models.CharField(
+        max_length=200,
+        verbose_name='Автор'
+    )
+    text = models.TextField(
+        verbose_name='Текст комментария'
+    )
+    created_date = models.DateTimeField(
+        default=timezone.now,
+        verbose_name='Дата создания'
+    )
+    approved_comment = models.BooleanField(
+        default=False,
+        verbose_name='Подтверженние комментария'
+    )
 
     def approve(self):
         self.approved_comment = True
@@ -50,19 +90,43 @@ class Comment(models.Model):
 
 
 class Variant(models.Model):
-    description = models.TextField()
+    class Meta:
+        verbose_name = 'Варианты ответа'
+        verbose_name_plural = 'Варианты ответа'
+
+    description = models.TextField(
+        verbose_name='Вариант ответа'
+    )
 
     def __str__(self):
         return self.description
 
 
-# Закртый вопрос
 class Question(models.Model):
-    title = models.CharField(max_length=128, null=True, blank=True)
-    description = models.TextField()
-    right_answer = models.ForeignKey(Variant, related_name='right', on_delete=models.CASCADE)
+    class Meta:
+        verbose_name = 'Закрытые вопросы'
+        verbose_name_plural = 'Закрытые вопросы'
 
-    variants = models.ManyToManyField(Variant)
+    title = models.CharField(
+        max_length=128,
+        null=True,
+        blank=True,
+        verbose_name='Заголовок'
+    )
+    description = models.TextField(
+        verbose_name='Вопрос'
+    )
+    right_answer = models.ForeignKey(
+        Variant,
+        related_name='right',
+        on_delete=models.CASCADE,
+        verbose_name='Правильный ответ'
+    )
+
+    variants = models.ManyToManyField(
+        Variant,
+        verbose_name='Варианты ответа'
+    )
 
     def create_form(self, i):
         from blog.forms import TestForm
@@ -78,10 +142,20 @@ class Question(models.Model):
         return self.title
 
 
-# Открытый вопрос
 class OpenQuestion(models.Model):
-    title = models.CharField(max_length=128, null=True, blank=True)
-    description = models.TextField()
+    class Meta:
+        verbose_name = 'Открытые вопросы'
+        verbose_name_plural = 'Открытые вопросы'
+
+    title = models.CharField(
+        max_length=128,
+        null=True,
+        blank=True,
+        verbose_name='Заголовок'
+    )
+    description = models.TextField(
+        verbose_name='Вопрос'
+    )
 
     def create_form(self, i):
         from blog.forms import TestForm
@@ -94,18 +168,36 @@ class OpenQuestion(models.Model):
 
 
 class StoreQuestion(models.Model):
-    # открытый или закрытый вопрос
-    test_type = models.CharField(max_length=128, choices=TEST_TYPE, default=TestType.CLOSE.value)
-
-    close_question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True, blank=True)
-    open_question = models.ForeignKey(OpenQuestion, on_delete=models.CASCADE, null=True, blank=True)
+    class Meta:
+        verbose_name = 'Хранилище вопросов'
+        verbose_name_plural = 'Хранилище вопросов'
+    test_type = models.CharField(
+        max_length=128,
+        choices=TEST_TYPE,
+        default=TestType.CLOSE.value,
+        verbose_name='Тип теста'
+    )
+    close_question = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name='Закрытый вопрос'
+    )
+    open_question = models.ForeignKey(
+        OpenQuestion,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name='Открытый вопрос'
+    )
 
     def create_question(self):
         if self.test_type == TestType.CLOSE.value:
             question_form = self.close_question.create_form(self.pk)
         elif self.test_type == TestType.OPEN.value:
-            question_form = self.open_question.create_form(self.pk)
 
+            question_form = self.open_question.create_form(self.pk)
         return question_form
 
     def get_question(self):
@@ -114,28 +206,60 @@ class StoreQuestion(models.Model):
             question = self.close_question
         elif self.test_type == TestType.OPEN.value:
             question = self.open_question
-
         return self.test_type, question
 
     def __str__(self):
-        return f'Type: {self.test_type} -> close: {self.close_question}, open: {self.open_question}'
+        return f'Тип: {self.test_type} -> закрытый: {self.close_question}, Открытый: {self.open_question}'
 
 
 class Test(models.Model):
-    title = models.CharField(max_length=128)
-    date_create = models.DateTimeField(default=timezone.now)
+    class Meta:
+        verbose_name = 'Тесты'
+        verbose_name_plural = 'Тесты'
 
-    questions = models.ManyToManyField(StoreQuestion)
+    title = models.CharField(
+        max_length=128,
+        verbose_name='Заголовок'
+    )
+    date_create = models.DateTimeField(
+        default=timezone.now,
+        verbose_name='Дата создания'
+    )
+
+    questions = models.ManyToManyField(
+        StoreQuestion,
+        verbose_name='Вопросы'
+    )
 
     def __str__(self):
         return self.title
 
 
 class StoreAnswer(models.Model):
-    test_type = models.CharField(max_length=128, choices=TEST_TYPE, default=TestType.CLOSE.value)
+    class Meta:
+        verbose_name = 'Хранилище ответов'
+        verbose_name_plural = 'Хранилище ответов'
 
-    close_answer = models.ForeignKey(Variant, on_delete=models.CASCADE, null=True, blank=True)
-    open_answer = models.CharField(max_length=512, null=True, blank=True)
+    test_type = models.CharField(
+        max_length=128,
+        choices=TEST_TYPE,
+        default=TestType.CLOSE.value,
+        verbose_name='Тип теста'
+    )
+
+    close_answer = models.ForeignKey(
+        Variant,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name='Закрытый ответ'
+    )
+    open_answer = models.CharField(
+        max_length=512,
+        null=True,
+        blank=True,
+        verbose_name='Открытый ответ'
+    )
 
     @staticmethod
     def create_answer(test_type: TestType, data):
@@ -165,31 +289,75 @@ class StoreAnswer(models.Model):
             answer = self.close_answer
         elif self.test_type == TestType.OPEN.value:
             answer = self.open_answer
-        return f'Type: {self.test_type} Answer: {answer}'
+        return f'Тип вопроса: {self.test_type} Ответ: {answer}'
 
 
 class UserAnswer(models.Model):
-    question = models.ForeignKey(StoreQuestion, on_delete=models.CASCADE)
-    answer = models.ForeignKey(StoreAnswer, on_delete=models.CASCADE)
+    class Meta:
+        verbose_name = 'Ответы пользователей'
+        verbose_name_plural = 'Ответы пользователей'
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    status = models.CharField(max_length=128, choices=ATTEMPT_STATUS, default=AttemptStatus.PENDING.value)
+    question = models.ForeignKey(
+        StoreQuestion,
+        on_delete=models.CASCADE,
+        verbose_name='Вопрос'
+    )
+    answer = models.ForeignKey(
+        StoreAnswer,
+        on_delete=models.CASCADE,
+        verbose_name='Ответ'
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь'
+    )
+    status = models.CharField(
+        max_length=128,
+        choices=ATTEMPT_STATUS,
+        default=AttemptStatus.PENDING.value,
+        verbose_name='Статус'
+    )
 
     def __str__(self):
-        return f'Question: {self.question}, User: {self.user} Answer: {self.answer} Status: {self.status}'
+        return f' Пользователь: {self.user} Статус: {self.status}'
 
 
 class Attempt(models.Model):
-    passage_date = models.DateTimeField(default=timezone.now)
-    test = models.ForeignKey(Test, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    user_answer = models.ManyToManyField(UserAnswer)
+    class Meta:
+        verbose_name = 'Попытки'
+        verbose_name_plural = 'Попытки'
 
-    status = models.CharField(max_length=128, choices=ATTEMPT_STATUS, default=AttemptStatus.PENDING.value)
+    passage_date = models.DateTimeField(
+        default=timezone.now,
+        verbose_name='Дата прохождения'
+    )
+    test = models.ForeignKey(
+        Test,
+        on_delete=models.CASCADE,
+        verbose_name='Тест'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь'
+    )
+    user_answer = models.ManyToManyField(
+        UserAnswer,
+        verbose_name='Ответ пользователя'
+    )
+
+    status = models.CharField(
+        max_length=128,
+        choices=ATTEMPT_STATUS,
+        default=AttemptStatus.PENDING.value,
+        verbose_name='Статус'
+    )
 
     def __str__(self):
         user_answer = list(map(lambda item: str(item), self.user_answer.values()))
-        return f'Test: {self.test}, User: {self.user}, Answer: {user_answer} Status: {self.status}'
+        return f'Тест: {self.test}, Пользователь: {self.user} Статус: {self.status}'
 
     def resolve_attempt(self):
         user_answers = self.user_answer.all()
@@ -205,21 +373,43 @@ class Attempt(models.Model):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    instructor = models.CharField(max_length=50, null=True, blank=True, verbose_name='Инструктор')
-    date_of_birth = models.DateField(null=True, blank=True, verbose_name='Дата рождения')
-
-    phone_number = models.CharField(max_length=17, null=True, blank=True, verbose_name='Номер телефона')
-    medical_certificate = models.BooleanField(default=False, blank=True, verbose_name='Медицинская справка')
-
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь'
+    )
+    instructor = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        verbose_name='Инструктор'
+    )
+    date_of_birth = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name='Дата рождения'
+    )
+    phone_number = models.CharField(
+        max_length=17,
+        null=True,
+        blank=True,
+        verbose_name='Номер телефона'
+    )
+    medical_certificate = models.BooleanField(
+        default=False,
+        blank=True,
+        verbose_name='Медицинская справка'
+    )
     avatar = models.ImageField(
         upload_to='avatars/',
         null=True,
         blank=True,
         verbose_name='аватар',
-
     )
 
+    class Meta:
+        verbose_name = 'Профиль пользователя'
+        verbose_name_plural = 'Профиль пользователя'
+
     def __str__(self):
-        return f'User: {self.user}, instructor: {self.instructor}'
-#     почему не могу убрать после запятой юзера?
+        return f'Пользователь: {self.user}, Инструктор: {self.instructor}'
