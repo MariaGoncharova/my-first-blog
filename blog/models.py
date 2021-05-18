@@ -171,6 +171,7 @@ class StoreQuestion(models.Model):
     class Meta:
         verbose_name = 'Хранилище вопросов'
         verbose_name_plural = 'Хранилище вопросов'
+
     test_type = models.CharField(
         max_length=128,
         choices=TEST_TYPE,
@@ -373,6 +374,14 @@ class Attempt(models.Model):
 
 
 class Profile(models.Model):
+    external_id = models.PositiveIntegerField(
+        verbose_name='ID polzov',
+        unique=True,
+    )
+
+    name = models.TextField(
+        verbose_name='Имя пользователя',
+    )
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -409,7 +418,29 @@ class Profile(models.Model):
 
     class Meta:
         verbose_name = 'Профиль пользователя'
-        verbose_name_plural = 'Профиль пользователя'
+        verbose_name_plural = 'Профили пользователей'
 
     def __str__(self):
         return f'Пользователь: {self.user}, Инструктор: {self.instructor}'
+
+
+# class Message(models.Model):
+#     profile = models.ForeignKey(
+#         to='blog.Profile',
+#         verbose_name='Профиль',
+#         on_delete=models.PROTECT,
+#     )
+#     text = models.TextField(
+#         verbose_name='Текст',
+#     )
+#     created_at = models.DateTimeField(
+#         verbose_name='Время получения',
+#         auto_now_add=True,
+#     )
+#
+#     class Meta:
+#         verbose_name = 'Сообщение'
+#         verbose_name_plural = 'Сообщения'
+#
+#     def __str__(self):
+#         return f'Сообщение: {self.pk} от : {self.profile}'

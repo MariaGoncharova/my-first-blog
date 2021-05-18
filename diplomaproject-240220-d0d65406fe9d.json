@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "diplomaproject-240220",
+  "private_key_id": "d0d65406fe9d8bab5d44200c24e76bf42285ec11",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDU2DZJwydZbAYQ\nRv+qnpiXHQcZZ4m/xmFo//d4GJCKEZTaqVNNgJH2oC43jmR9KVrA3bceCdbz+SBE\nlXUc/ZX1cA6SyvVpw7jIkiAnQ29HwylYHUWTASBza8v/cmKdOYArsHh118VS9IZl\nWkD8YmsZ53Z5RqJVcnrkOu2ayah6udTnwRm9pIhOhkBwCsXjBmGXnn9zslLvR1dh\n47PTBfWGW1APv42DXgkm2DdLwsIhizzVr3LhhtgJ5BwLLe13vaXSl5ZTep8/a3xl\n99bmP97uFzjoXcojo34H6Ettzf0lUFb6RKiySP8/gcLmbk8jOrZayXOZK2ca0jK2\n6v2D2E4hAgMBAAECggEABr9B3U276hhECvENOr3jTWsEphgDpFooDVmL4Tk6H75V\n7yaN9vd76QsD3Av+AH+2mkWM//1E3KAJl1L7jus0/T5Ln/iiFfO34FfNgCEhnm8/\n2MS4x2OyQSZqJZNdL+m6N+hUsTuhTDNnLUBSrg16oqwVM9v62mWSIrkBfjYlSpqZ\noDG2OKy02UMqXRayTnocZVf+Ay6x9a6Hs7sP1W51k+yJwJnHvucTfBfUSzpE1xgc\nkwBsa+Vcke7BnvTabcQsLJ72/qXylnALQh7pELfKFgDG+hfaRklZ4D/h/amFlM1K\nmVZJOxwfFHcZdTZiVXMr425RrrOAnDjBAa4loop3IQKBgQD64L5khcSgG38PfLay\n2WW9hMsiJ7/WeVrOklFcF/zpaNevyvgh/P/GpwWEl4FNp4ijirSBWE4HRO3fhqr2\naJH97Ap+05fgajwzgQWWPofqh3ftHlKOYT0gMOI83TSpmE9V5Sk3/ICXhNcfKYeX\nq0vdXem1G8m/HCcmlO/xTSOAyQKBgQDZMK4/XhVSfBlKLik0eMlh6EPi+WwnRATi\nu6Nmw89QtFPLArnyICzMfZD4sF3J06mMR1hrTfo4rGZdVLQVmrXcLGcQB89euzrI\nOiK3+5dTAGyHoYYa5xr+kxhDuxwpTmvaQDBBxjChU4FOnNISHvbBAgYdXtxJ0sFS\nr+q+QC6mmQKBgEG/GkZPxCrNaewOG/cdAAu9vFp0HlM/tGuEbuv6oV4uCrBYOdT2\nb7WI2epYphtKt4VceVeYY8KF7uzwZudymif4bvuzyg6W6LX6rxMjygzNecFbe/ky\nRImmJfQbaIy1jL0O9FFmy/BpcNMK2C0ISDZ4QSIkaSe7Ygs7ZvJO6+n5AoGAB66P\nGzKqsmYtRtBnKLH0/X+HlymXR7RCL/rPBr16QbJ/HDkWdpfovbrbO9CRIKhZ4NpN\nKE5zwTlnzXlHfVQhho4Tfx+nmAQrShW0UKmXapojPJDb+2udKs/tFcgycMuTSP7o\nNgtagPpBIpStYXKy65S0vqkyRXIs4E3UkbIXdFECgYEA4FLTfcuMI4M+2QjRus9/\nj1ZrOK4bZOHuVm7eJ0wLUMPa9mb2V1t3GirSfSsAQo1ad8ianficE0J3PoOPc9Zz\nlzfff9TmzszAr1BJiACr4qvpUc+MCXkOrMWpTl+dRYaKutG0G2dzJybsXoqWvNL9\nKa5LG+4jstg3JsPIgr4/XXU=\n-----END PRIVATE KEY-----\n",
+  "client_email": "questionparser@diplomaproject-240220.iam.gserviceaccount.com",
+  "client_id": "105567754421068399919",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/questionparser%40diplomaproject-240220.iam.gserviceaccount.com"
+}

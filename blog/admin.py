@@ -1,6 +1,6 @@
 from django.contrib import admin
-
-from .models import Post, Comment, Test, Question, Variant, UserAnswer, Attempt, StoreQuestion, OpenQuestion,\
+from .forms import ProfileForm
+from .models import Post, Comment, Test, Question, Variant, UserAnswer, Attempt, StoreQuestion, OpenQuestion, \
     StoreAnswer, Profile
 
 admin.site.register(Post)
@@ -15,4 +15,14 @@ admin.site.register(StoreQuestion)
 admin.site.register(OpenQuestion)
 admin.site.register(StoreAnswer)
 
-admin.site.register(Profile)
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('id', 'external_id', 'name')
+    form = ProfileForm
+
+#
+# @admin.register(Message)
+# class MessageAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'profile', 'text', 'created_at')
+

@@ -1,6 +1,5 @@
 from django.apps import AppConfig
 
-
 class TestSystem(AppConfig):
     name = 'blog'
     verbose_name = 'Система тестирования'

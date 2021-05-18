@@ -3,7 +3,19 @@ from django.forms import Textarea
 
 from blog.constants import TestType, AttemptStatus
 from blog.utils import get_id_for_form_fields
-from .models import Post, Comment
+from .models import Post, Comment, Profile
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = (
+            'external_id',
+            'user',
+        )
+        widgets = {
+            'user': forms.TextInput,
+        }
 
 
 class PostForm(forms.ModelForm):
