@@ -38,7 +38,6 @@ CALLBACK_BUTTON_TEST_LIST = "callback_button_test_list"
 
 CALLBACK_BUTTON5_TIME = "callback_button5_time"
 
-
 TITLES = {
     CALLBACK_BUTTON1: "1️⃣",
     CALLBACK_BUTTON2: "2️⃣",
@@ -188,23 +187,43 @@ def keyboard_callback_handler(update: Update, context: CallbackContext):
         )
 
         test = get_object_or_404(Test, pk=2)
-        questions = test.questions.filter(close_question=4)
-        question = [question.close_question.description for question in questions]
-        question_title = ''.join(question)
-        answers = [question.close_question.variants for question in questions]
+
+        # questions = test.questions.filter(close_question=4)
+
+        questions_set = test.questions.all()
+        questions_lst = []
+
+        # question = [question.close_question.description for question in questions_set]
+        # question_title = ''.join(question)
+        answers = [question.close_question.variants for question in questions_set]
         answer_lst = []
+        # for answer in answers:
+        #     for a in answer.all():
+        #         answer_lst.append(a.description)
 
-        for answer in answers:
-            for a in answer.all():
-                answer_lst.append(a.description)
+        for question in questions_set:
+            questions_lst.append(question.close_question)
 
-        answer = ' '.join(answer_lst)
+        question_answer_dict = dict(zip(questions_lst, [answer.all() for answer in answers]))
+        print(question_answer_dict)
+
+        for a, answer in question_answer_dict.items():
+            print(a, answer_lst)
+        for question, answer in question_answer_dict.items():
+            print(question, answer_lst)
+
         # Отправим новое сообщение при нажатии на кнопку
-        context.bot.send_message(
-            chat_id=chat_id,
-            text="вопрос: \n" + question_title + ' варианты ответа: \n' + answer,
-            reply_markup=get_next_question_keyboard()
-        )
+        for question, answer in question_answer_dict.items():
+            print(answer)
+            context.bot.send_message(
+                chat_id=chat_id,
+                text="вопрос: \n" + question.description + '\n варианты ответа: \n' + '\n'.join(
+                    [a.description for a in answer.all()]),
+                reply_markup=get_next_question_keyboard()
+            )
+        # print(questions_lst)
+
+
 
     # elif data == CALLBACK_BUTTON_NEXT_QUESTION:
     #     query.edit_message_text(
