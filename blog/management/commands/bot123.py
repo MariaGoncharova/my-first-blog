@@ -3,7 +3,6 @@ from datetime import datetime
 from logging import getLogger
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from django.shortcuts import get_object_or_404
 from telegram.utils.request import Request
 from telegram import Bot, ParseMode, ReplyKeyboardRemove
 from telegram import InlineKeyboardButton
@@ -15,8 +14,7 @@ from telegram.ext import MessageHandler
 from telegram.ext import Filters
 from telegram.ext import CallbackQueryHandler
 
-import blog
-from blog.models import Profile, Test, StoreQuestion
+from blog.models import Profile
 from blog.utils import logger_factory
 
 logger = getLogger(__name__)
@@ -25,33 +23,42 @@ debug_requests = logger_factory(logger=logger)
 
 # `callback_data` -- это то, что будет присылать TG при нажатии на каждую кнопку.
 # Поэтому каждый идентификатор должен быть уникальным
+CALLBACK_BUTTON1_LEFT = "callback_button1_left"
+CALLBACK_BUTTON2_RIGHT = "callback_button2_right"
+CALLBACK_BUTTON3_MORE = "callback_button3_more"
+CALLBACK_BUTTON4_BACK = "callback_button4_back"
+CALLBACK_BUTTON5_TIME = "callback_button5_time"
+CALLBACK_BUTTON6_PRICE = "callback_button6_price"
+CALLBACK_BUTTON7_PRICE = "callback_button7_price"
+CALLBACK_BUTTON8_PRICE = "callback_button8_price"
+CALLBACK_BUTTON_HIDE_KEYBOARD = "callback_button9_hide"
 CALLBACK_BUTTON1 = "callback_button1"
 CALLBACK_BUTTON2 = "callback_button2"
 CALLBACK_BUTTON3 = "callback_button3"
 CALLBACK_BUTTON4 = "callback_button4"
 CALLBACK_BUTTON5 = "callback_button5"
-CALLBACK_BUTTON_START_TEST = "callback_button_start_test"
 CALLBACK_BUTTON_NEXT_QUESTION = "callback_button_next_question"
-CALLBACK_BUTTON_HIDE_KEYBOARD = "callback_button9_hide"
-CALLBACK_BUTTON_RESULT = "callback_button_result"
-CALLBACK_BUTTON_TEST_LIST = "callback_button_test_list"
-
-CALLBACK_BUTTON5_TIME = "callback_button5_time"
-
+CALLBACK_BUTTON_PREV_QUESTION = "callback_button_prev_question"
+CALLBACK_BUTTON_START_TEST = "callback_button_start_test"
 
 TITLES = {
+    CALLBACK_BUTTON1_LEFT: "Новое сообщение ⚡️",
+    CALLBACK_BUTTON2_RIGHT: "Отредактировать ✏️",
+    CALLBACK_BUTTON3_MORE: "Ещё ➡️",
+    CALLBACK_BUTTON4_BACK: "Назад ⬅️",
+    CALLBACK_BUTTON5_TIME: "Время ⏰",
+    CALLBACK_BUTTON6_PRICE: "BTC 💰",
+    CALLBACK_BUTTON7_PRICE: "LTC 💰",
+    CALLBACK_BUTTON8_PRICE: "ETH 💰",
+    CALLBACK_BUTTON_HIDE_KEYBOARD: "Спрять клавиатуру",
     CALLBACK_BUTTON1: "1️⃣",
     CALLBACK_BUTTON2: "2️⃣",
     CALLBACK_BUTTON3: "️3️⃣",
     CALLBACK_BUTTON4: "️4️⃣",
     CALLBACK_BUTTON5: "5️⃣",
-    CALLBACK_BUTTON_START_TEST: "Начать тестирование ✅",
     CALLBACK_BUTTON_NEXT_QUESTION: "Следующий вопрос ➡️",
-    CALLBACK_BUTTON5_TIME: "Время ⏰",
-    CALLBACK_BUTTON_HIDE_KEYBOARD: "Спрятать клавиатуру ⬇️",
-    CALLBACK_BUTTON_RESULT: "Результат 📄",
-    CALLBACK_BUTTON_TEST_LIST: "К списку тестов ⬅️",
-
+    CALLBACK_BUTTON_PREV_QUESTION: "Предыдущий вопрос ➡️",
+    CALLBACK_BUTTON_START_TEST: "Начать тестирование ✅",
 }
 
 
@@ -85,69 +92,65 @@ def get_test_inline_keyboard():
             InlineKeyboardButton(TITLES[CALLBACK_BUTTON4], callback_data=CALLBACK_BUTTON4),
             InlineKeyboardButton(TITLES[CALLBACK_BUTTON5], callback_data=CALLBACK_BUTTON5),
         ],
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_HIDE_KEYBOARD], callback_data=CALLBACK_BUTTON_HIDE_KEYBOARD),
-        ],
     ]
     return InlineKeyboardMarkup(keyboard)
 
 
-# Уведомление о начале теста, кнопки назад и старт
-def get_test_start_keyboard():
-    keyboard = [
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_START_TEST], callback_data=CALLBACK_BUTTON_START_TEST),
-        ],
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_TEST_LIST], callback_data=CALLBACK_BUTTON_TEST_LIST),
-        ],
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_HIDE_KEYBOARD], callback_data=CALLBACK_BUTTON_HIDE_KEYBOARD),
-        ],
-    ]
-    return InlineKeyboardMarkup(keyboard)
-
-
-# Уведомление о вариантах ответа
-def get_variants_keyboard():
-    keyboard = [
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON1], callback_data=CALLBACK_BUTTON1),
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON2], callback_data=CALLBACK_BUTTON2),
-        ],
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON3], callback_data=CALLBACK_BUTTON3),
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON4], callback_data=CALLBACK_BUTTON4),
-        ],
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_HIDE_KEYBOARD], callback_data=CALLBACK_BUTTON_HIDE_KEYBOARD),
-        ],
-    ]
-    return InlineKeyboardMarkup(keyboard)
-
-
-# Уведомление о Следующем вопросе
-def get_next_question_keyboard():
+# Кнопки вперед и назад после ответа на тест
+def get_test_inline_keyboard():
     keyboard = [
         [
             InlineKeyboardButton(TITLES[CALLBACK_BUTTON_NEXT_QUESTION], callback_data=CALLBACK_BUTTON_NEXT_QUESTION),
         ],
         [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_HIDE_KEYBOARD], callback_data=CALLBACK_BUTTON_HIDE_KEYBOARD),
+            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_PREV_QUESTION], callback_data=CALLBACK_BUTTON_PREV_QUESTION),
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
 
 
-# Уведомление о Последнем вопросе вопросе
-def get_end_keyboard():
+# Кнопки старт и назад после выбора теста
+def get_test_start_keyboard():
     keyboard = [
         [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_RESULT], callback_data=CALLBACK_BUTTON_RESULT),
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_TEST_LIST], callback_data=CALLBACK_BUTTON_TEST_LIST),
+            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_START_TEST], callback_data=CALLBACK_BUTTON_START_TEST),
+            InlineKeyboardButton(TITLES[CALLBACK_BUTTON4_BACK], callback_data=CALLBACK_BUTTON4_BACK),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_base_inline_keyboard():
+    keyboard = [
+        [
+            InlineKeyboardButton(TITLES[CALLBACK_BUTTON1_LEFT], callback_data=CALLBACK_BUTTON1_LEFT),
+            InlineKeyboardButton(TITLES[CALLBACK_BUTTON2_RIGHT], callback_data=CALLBACK_BUTTON2_RIGHT),
         ],
         [
             InlineKeyboardButton(TITLES[CALLBACK_BUTTON_HIDE_KEYBOARD], callback_data=CALLBACK_BUTTON_HIDE_KEYBOARD),
+        ],
+        [
+            InlineKeyboardButton(TITLES[CALLBACK_BUTTON3_MORE], callback_data=CALLBACK_BUTTON3_MORE),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_keyboard2():
+    """ Получить вторую страницу клавиатуры для сообщений
+        Возможно получить только при нажатии кнопки на первой клавиатуре
+    """
+    keyboard = [
+        [
+            InlineKeyboardButton(TITLES[CALLBACK_BUTTON5_TIME], callback_data=CALLBACK_BUTTON5_TIME),
+        ],
+        [
+            InlineKeyboardButton(TITLES[CALLBACK_BUTTON6_PRICE], callback_data=CALLBACK_BUTTON6_PRICE),
+            InlineKeyboardButton(TITLES[CALLBACK_BUTTON7_PRICE], callback_data=CALLBACK_BUTTON7_PRICE),
+            InlineKeyboardButton(TITLES[CALLBACK_BUTTON8_PRICE], callback_data=CALLBACK_BUTTON8_PRICE),
+        ],
+        [
+            InlineKeyboardButton(TITLES[CALLBACK_BUTTON4_BACK], callback_data=CALLBACK_BUTTON4_BACK),
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -160,84 +163,58 @@ def keyboard_callback_handler(update: Update, context: CallbackContext):
     query = update.callback_query
     data = query.data
     now = datetime.now()
-    tests_titles = [test.title for test in Test.objects.all()]
-    titles = ' '.join(tests_titles)
-    tests_id = [test.id for test in Test.objects.all()]
+
     # Обратите внимание: используется `effective_message`
     chat_id = update.effective_message.chat_id
     current_text = update.effective_message.text
 
-    if data == CALLBACK_BUTTON1:
+    if data == CALLBACK_BUTTON1_LEFT:
+        # "Удалим" клавиатуру у прошлого сообщения
+        # (на самом деле отредактируем его так, что текст останется тот же, а клавиатура пропадёт)
         query.edit_message_text(
             text=current_text,
             parse_mode=ParseMode.MARKDOWN,
         )
-        tests_titles = [test.title for test in Test.objects.all().filter(id=tests_id[0])]
-        titles_test = ''.join(tests_titles)
         # Отправим новое сообщение при нажатии на кнопку
         context.bot.send_message(
             chat_id=chat_id,
-            text="Вы выбрали тест: " + titles_test,
-            reply_markup=get_test_start_keyboard(),
+            text="Новое сообщение\n\ncallback_query.data={}".format(data),
+            reply_markup=get_base_inline_keyboard(),
         )
-
-    elif data == CALLBACK_BUTTON_START_TEST:
+    elif data == CALLBACK_BUTTON2_RIGHT:
+        # Отредактируем текст сообщения, но оставим клавиатуру
+        query.edit_message_text(
+            text="Успешно отредактировано в {}".format(now),
+            reply_markup=get_base_inline_keyboard(),
+        )
+    elif data == CALLBACK_BUTTON3_MORE:
+        # Показать следующий экран клавиатуры
+        # (оставить тот же текст, но указать другой массив кнопок)
         query.edit_message_text(
             text=current_text,
+            reply_markup=get_keyboard2(),
+        )
+    elif data == CALLBACK_BUTTON4_BACK:
+        # Показать предыдущий экран клавиатуры
+        # (оставить тот же текст, но указать другой массив кнопок)
+        query.edit_message_text(
+            text=current_text,
+            reply_markup=get_base_inline_keyboard(),
+        )
+    elif data == CALLBACK_BUTTON5_TIME:
+        # Покажем новый текст и оставим ту же клавиатуру
+        text = "*Точное время*\n\n{}".format(now)
+        query.edit_message_text(
+            text=text,
             parse_mode=ParseMode.MARKDOWN,
+            reply_markup=get_keyboard2(),
         )
-
-        test = get_object_or_404(Test, pk=2)
-        questions = test.questions.filter(close_question=4)
-        question = [question.close_question.description for question in questions]
-        question_title = ''.join(question)
-        answers = [question.close_question.variants for question in questions]
-        answer_lst = []
-
-        for answer in answers:
-            for a in answer.all():
-                answer_lst.append(a.description)
-
-        answer = ' '.join(answer_lst)
-        # Отправим новое сообщение при нажатии на кнопку
-        context.bot.send_message(
-            chat_id=chat_id,
-            text="вопрос: \n" + question_title + ' варианты ответа: \n' + answer,
-            reply_markup=get_next_question_keyboard()
-        )
-
-    # elif data == CALLBACK_BUTTON_NEXT_QUESTION:
-    #     query.edit_message_text(
-    #         text=current_text,
-    #         parse_mode=ParseMode.MARKDOWN,
-    #     )
-    #
-    #     test = get_object_or_404(Test, pk=2)
-    #     questions = test.questions.filter(close_question=5)
-    #     question = [question.close_question.description for question in questions]
-    #     question_title = ''.join(question)
-    #     answers = [question.close_question.variants for question in questions]
-    #     answer_lst = []
-    #
-    #     for answer in answers:
-    #         for a in answer.all():
-    #             answer_lst.append(a.description)
-    #
-    #     answer = ' '.join(answer_lst)
-    #     # Отправим новое сообщение при нажатии на кнопку
-    #     context.bot.send_message(
-    #         chat_id=chat_id,
-    #         text="вопрос: \n" + question_title + ' варианты ответа: \n' + answer,
-    #         reply_markup=get_next_question_keyboard()
-    #     )
-
-    elif data == CALLBACK_BUTTON_TEST_LIST:
-        # Отправим новое сообщение при нажатии на кнопку
-        context.bot.send_message(
-            chat_id=chat_id,
-            text="Доступные тесты: \n" + titles,
-            reply_markup=get_test_inline_keyboard(),
-        )
+    elif data in (CALLBACK_BUTTON6_PRICE, CALLBACK_BUTTON7_PRICE, CALLBACK_BUTTON8_PRICE):
+        pair = {
+            CALLBACK_BUTTON6_PRICE: "USD-BTC",
+            CALLBACK_BUTTON7_PRICE: "USD-LTC",
+            CALLBACK_BUTTON8_PRICE: "USD-ETH",
+        }[data]
 
     elif data == CALLBACK_BUTTON_HIDE_KEYBOARD:
         # Спрятать клавиатуру
@@ -249,24 +226,35 @@ def keyboard_callback_handler(update: Update, context: CallbackContext):
             reply_markup=ReplyKeyboardRemove(),
         )
 
+    elif data == CALLBACK_BUTTON1:
+        # Покажем новый текст и оставим ту же клавиатуру
+        text = "*Вы выбрали тест*\n\n{}".format(now)
+        # TODO: сделать вывод теста который выбрали
+        context.bot.send_message(
+            text=text,
+            reply_markup=get_test_start_keyboard(),
+        )
+
+    elif data == CALLBACK_BUTTON_START_TEST:
+        # "Удалим" клавиатуру у прошлого сообщения
+        # (на самом деле отредактируем его так, что текст останется тот же, а клавиатура пропадёт)
+        query.edit_message_text(
+            text=current_text,
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        # Отправим новое сообщение при нажатии на кнопку
+        context.bot.send_message(
+            text="1 вопрос".format(data),
+            reply_markup=get_base_inline_keyboard(),
+        )
+
 
 # Начало диалога
 @log_errors
 def do_start(update: Update, context: CallbackContext):
     update.message.reply_text(
-        text="Привет! Я бот для тестирования\nНажмите /help для вызова помощи."
-             "\nНажмите /tests для вывода списка тестов.",
-    )
-
-
-# Начало теста
-@log_errors
-def do_tests(update: Update, context: CallbackContext):
-    tests_titles = [test.title for test in Test.objects.all()]
-    titles = ' '.join(tests_titles)
-    update.message.reply_text(
-        text="Доступные тесты: " + titles,
-        reply_markup=get_test_inline_keyboard(),
+        text="Привет! Я бот для тестирования\nНажмите /help для вызова помощи.\n",
+        reply_markup=get_base_inline_keyboard(),
     )
 
 
@@ -320,13 +308,11 @@ class Command(BaseCommand):
 
         start_handler = CommandHandler('start', do_start)
         help_handler = CommandHandler('help', do_help)
-        test_handler = CommandHandler('tests', do_tests)
         message_handler = MessageHandler(Filters.text, do_echo)
         buttons_handler = CallbackQueryHandler(callback=keyboard_callback_handler)
         updater.dispatcher.add_handler(message_handler)
         updater.dispatcher.add_handler(start_handler)
         updater.dispatcher.add_handler(help_handler)
-        updater.dispatcher.add_handler(test_handler)
         updater.dispatcher.add_handler(buttons_handler)
 
         # 3 -- запустить бесконечную обработку входящих сообщений
