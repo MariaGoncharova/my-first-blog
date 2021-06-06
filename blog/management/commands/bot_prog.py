@@ -32,9 +32,6 @@ CALLBACK_BUTTON4 = "callback_button4"
 CALLBACK_BUTTON5 = "callback_button5"
 CALLBACK_BUTTON_START_TEST = "callback_button_start_test"
 CALLBACK_BUTTON_NEXT_QUESTION = "callback_button_next_question"
-CALLBACK_BUTTON_NEXT_QUESTION1 = "callback_button_next_question1"
-CALLBACK_BUTTON_NEXT_QUESTION2 = "callback_button_next_question2"
-CALLBACK_BUTTON_EXIT = "callback_button_next_EXIT"
 CALLBACK_BUTTON_HIDE_KEYBOARD = "callback_button9_hide"
 CALLBACK_BUTTON_RESULT = "callback_button_result"
 CALLBACK_BUTTON_TEST_LIST = "callback_button_test_list"
@@ -49,9 +46,6 @@ TITLES = {
     CALLBACK_BUTTON5: "5️⃣",
     CALLBACK_BUTTON_START_TEST: "Начать тестирование ✅",
     CALLBACK_BUTTON_NEXT_QUESTION: "Следующий вопрос ➡️",
-    CALLBACK_BUTTON_NEXT_QUESTION1: "Следующий вопрос ➡️",
-    CALLBACK_BUTTON_NEXT_QUESTION2: "Следующий вопрос ➡️",
-    CALLBACK_BUTTON_EXIT: "Завершить тестирование️ ✍🏼",
     CALLBACK_BUTTON5_TIME: "Время ⏰",
     CALLBACK_BUTTON_HIDE_KEYBOARD: "Спрятать клавиатуру ⬇️",
     CALLBACK_BUTTON_RESULT: "Результат 📄",
@@ -113,56 +107,8 @@ def get_test_start_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_return():
-    keyboard = [
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_TEST_LIST], callback_data=CALLBACK_BUTTON_TEST_LIST),
-        ],
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_HIDE_KEYBOARD], callback_data=CALLBACK_BUTTON_HIDE_KEYBOARD),
-        ],
-    ]
-    return InlineKeyboardMarkup(keyboard)
-
-
 # Уведомление о вариантах ответа
-def get_variants_keyboard1():
-    keyboard = [
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON1], callback_data=CALLBACK_BUTTON1),
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON2], callback_data=CALLBACK_BUTTON2),
-        ],
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON3], callback_data=CALLBACK_BUTTON3),
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON4], callback_data=CALLBACK_BUTTON4),
-        ],
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_HIDE_KEYBOARD], callback_data=CALLBACK_BUTTON_HIDE_KEYBOARD),
-        ],
-    ]
-    return InlineKeyboardMarkup(keyboard)
-
-
-# Уведомление о вариантах ответа
-def get_variants_keyboard2():
-    keyboard = [
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON1], callback_data=CALLBACK_BUTTON1),
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON2], callback_data=CALLBACK_BUTTON2),
-        ],
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON3], callback_data=CALLBACK_BUTTON3),
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON4], callback_data=CALLBACK_BUTTON4),
-        ],
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_HIDE_KEYBOARD], callback_data=CALLBACK_BUTTON_HIDE_KEYBOARD),
-        ],
-    ]
-    return InlineKeyboardMarkup(keyboard)
-
-
-# Уведомление о вариантах ответа
-def get_variants_keyboard3():
+def get_variants_keyboard():
     keyboard = [
         [
             InlineKeyboardButton(TITLES[CALLBACK_BUTTON1], callback_data=CALLBACK_BUTTON1),
@@ -184,35 +130,6 @@ def get_next_question_keyboard():
     keyboard = [
         [
             InlineKeyboardButton(TITLES[CALLBACK_BUTTON_NEXT_QUESTION], callback_data=CALLBACK_BUTTON_NEXT_QUESTION),
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_EXIT], callback_data=CALLBACK_BUTTON_EXIT),
-        ],
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_HIDE_KEYBOARD], callback_data=CALLBACK_BUTTON_HIDE_KEYBOARD),
-        ],
-    ]
-    return InlineKeyboardMarkup(keyboard)
-
-
-# Уведомление о Следующем вопросе
-def get_next_question_keyboard1():
-    keyboard = [
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_NEXT_QUESTION1], callback_data=CALLBACK_BUTTON_NEXT_QUESTION1),
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_EXIT], callback_data=CALLBACK_BUTTON_EXIT),
-        ],
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_HIDE_KEYBOARD], callback_data=CALLBACK_BUTTON_HIDE_KEYBOARD),
-        ],
-    ]
-    return InlineKeyboardMarkup(keyboard)
-
-
-# Уведомление о Следующем вопросе
-def get_next_question_keyboard2():
-    keyboard = [
-        [
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_NEXT_QUESTION2], callback_data=CALLBACK_BUTTON_NEXT_QUESTION2),
-            InlineKeyboardButton(TITLES[CALLBACK_BUTTON_EXIT], callback_data=CALLBACK_BUTTON_EXIT),
         ],
         [
             InlineKeyboardButton(TITLES[CALLBACK_BUTTON_HIDE_KEYBOARD], callback_data=CALLBACK_BUTTON_HIDE_KEYBOARD),
@@ -238,11 +155,13 @@ def get_end_keyboard():
 @log_errors
 def keyboard_callback_handler(update: Update, context: CallbackContext):
     """ Обработчик ВСЕХ кнопок со ВСЕХ клавиатур
-    :type update: object
     """
     query = update.callback_query
     data = query.data
     now = datetime.now()
+    tests_titles = [test.title for test in Test.objects.all()]
+    titles = ' '.join(tests_titles)
+    tests_id = [test.id for test in Test.objects.all()]
     # Обратите внимание: используется `effective_message`
     chat_id = update.effective_message.chat_id
     current_text = update.effective_message.text
@@ -252,11 +171,12 @@ def keyboard_callback_handler(update: Update, context: CallbackContext):
             text=current_text,
             parse_mode=ParseMode.MARKDOWN,
         )
-
+        tests_titles = [test.title for test in Test.objects.all().filter(id=tests_id[0])]
+        titles_test = ''.join(tests_titles)
         # Отправим новое сообщение при нажатии на кнопку
         context.bot.send_message(
             chat_id=chat_id,
-            text="Вы выбрали тест: Количественные параметры информационных объектов",
+            text="Вы выбрали тест: " + titles_test,
             reply_markup=get_test_start_keyboard(),
         )
 
@@ -266,117 +186,82 @@ def keyboard_callback_handler(update: Update, context: CallbackContext):
             parse_mode=ParseMode.MARKDOWN,
         )
 
-        context.bot.send_message(
-            chat_id=chat_id,
-            text="Вопрос: Статья, набранная на компьютере, содержит 32 страницы, на каждой странице 40 строк, "
-                 "в каждой строке 48 символов. Определите размер статьи в кодировке КОИ-8, в которой каждый символ "
-                 "кодируется 8 битами.\n"
-                 '\n Варианты ответа:'
-                 '\n 1. 120 Кбайт'
-                 '\n 2. 480 байт'
-                 '\n 3. 960 байт'
-                 '\n 4. 60 Кбайт',
-            reply_markup=get_variants_keyboard1()
-        )
+        test = get_object_or_404(Test, pk=2)
+
+        # questions = test.questions.filter(close_question=4)
+
+        questions_set = test.questions.all()
+        questions_lst = []
+
+        # question = [question.close_question.description for question in questions_set]
+        # question_title = ''.join(question)
+        answers = [question.close_question.variants for question in questions_set]
+        answer_lst = []
+        # for answer in answers:
+        #     for a in answer.all():
+        #         answer_lst.append(a.description)
+
+        for question in questions_set:
+            questions_lst.append(question.close_question)
+
+        question_answer_dict = dict(zip(questions_lst, [answer.all() for answer in answers]))
+        print(question_answer_dict)
+
+        for a, answer in question_answer_dict.items():
+            print(a, answer_lst)
+        for question, answer in question_answer_dict.items():
+            print(question, answer_lst)
+
+        # Отправим новое сообщение при нажатии на кнопку
+        for question, answer in question_answer_dict.items():
+            print(answer)
+            update.message.reply_text(
+                chat_id=chat_id,
+                text="вопрос: \n" + question.description + '\n варианты ответа: \n' + '\n'.join(
+                    [a.description for a in answer.all()]),
+                reply_markup=get_next_question_keyboard()
+            )
+            # context.bot.send_message(
+            #     chat_id=chat_id,
+            #     text="вопрос: \n" + question.description + '\n варианты ответа: \n' + '\n'.join(
+            #         [a.description for a in answer.all()]),
+            #     reply_markup=get_next_question_keyboard()
+            # )
+        # print(questions_lst)
+
+
+
+    # elif data == CALLBACK_BUTTON_NEXT_QUESTION:
+    #     query.edit_message_text(
+    #         text=current_text,
+    #         parse_mode=ParseMode.MARKDOWN,
+    #     )
+    #
+    #     test = get_object_or_404(Test, pk=2)
+    #     questions = test.questions.filter(close_question=5)
+    #     question = [question.close_question.description for question in questions]
+    #     question_title = ''.join(question)
+    #     answers = [question.close_question.variants for question in questions]
+    #     answer_lst = []
+    #
+    #     for answer in answers:
+    #         for a in answer.all():
+    #             answer_lst.append(a.description)
+    #
+    #     answer = ' '.join(answer_lst)
+    #     # Отправим новое сообщение при нажатии на кнопку
+    #     context.bot.send_message(
+    #         chat_id=chat_id,
+    #         text="вопрос: \n" + question_title + ' варианты ответа: \n' + answer,
+    #         reply_markup=get_next_question_keyboard()
+    #     )
 
     elif data == CALLBACK_BUTTON_TEST_LIST:
         # Отправим новое сообщение при нажатии на кнопку
         context.bot.send_message(
             chat_id=chat_id,
-            text="Доступные тесты: "
-                 "\n 1. Количественные параметры информационных объектов"
-                 "\n 2. Значение логического выражения"
-                 "\n 3. Файловая система организации данных"
-                 "\n 4. Программа с условным оператором"
-                 "\n 5. Формальные описания реальных объектов и процессов",
+            text="Доступные тесты: \n" + titles,
             reply_markup=get_test_inline_keyboard(),
-        )
-
-    elif data == CALLBACK_BUTTON2:
-        query.edit_message_text(
-            text=current_text,
-            parse_mode=ParseMode.MARKDOWN,
-        )
-
-        context.bot.send_message(
-            chat_id=chat_id,
-            text="Ваш ответ: 2. 480 байт",
-            reply_markup=get_next_question_keyboard1(),
-        )
-
-    elif data == CALLBACK_BUTTON_NEXT_QUESTION1:
-        query.edit_message_text(
-            text=current_text,
-            parse_mode=ParseMode.MARKDOWN,
-        )
-
-        context.bot.send_message(
-            chat_id=chat_id,
-            text="Вопрос: Для какого из приведённых значений числа X ложно высказывание: НЕ (X < 6) ИЛИ (X < 5)?\n"
-                 '\n Варианты ответа:'
-                 '\n 1. 7'
-                 '\n 2. 6'
-                 '\n 3. 5'
-                 '\n 4. 4',
-            reply_markup=get_variants_keyboard1()
-        )
-
-    elif data == CALLBACK_BUTTON3:
-        query.edit_message_text(
-            text=current_text,
-            parse_mode=ParseMode.MARKDOWN,
-        )
-
-        context.bot.send_message(
-            chat_id=chat_id,
-            text="Ваш ответ: 3. 5",
-            reply_markup=get_next_question_keyboard2(),
-        )
-
-    elif data == CALLBACK_BUTTON_NEXT_QUESTION2:
-        query.edit_message_text(
-            text=current_text,
-            parse_mode=ParseMode.MARKDOWN,
-        )
-
-        context.bot.send_message(
-            chat_id=chat_id,
-            text="Вопрос: Пользователь находился в каталоге Расписание. Сначала он поднялся на один уровень вверх, "
-                 "затем спустился на один уровень вниз, потом ещё раз спустился на один уровень вниз. В результате он "
-                 "оказался в каталоге\n "
-                 "С:\учёба\математика\ГИА.\n"
-                 "Укажите полный путь каталога, с которым пользователь начинал работу."
-                 '\n Варианты ответа:'
-                 '\n 1. С:\учёба\2013\Расписание'
-                 '\n 2. С:\учёба\Расписание'
-                 '\n 3. С:\Расписание'
-                 '\n 4. С:\учёба\математика\Расписание',
-            reply_markup=get_variants_keyboard1()
-        )
-
-    elif data == CALLBACK_BUTTON4:
-        query.edit_message_text(
-            text=current_text,
-            parse_mode=ParseMode.MARKDOWN,
-        )
-
-        context.bot.send_message(
-            chat_id=chat_id,
-            text='Ваш ответ: 4. С:\учёба\математика\Расписание'
-                 'Тест окончен ⬇️',
-            reply_markup=get_end_keyboard(),
-        )
-
-    elif data == CALLBACK_BUTTON_RESULT:
-        query.edit_message_text(
-            text=current_text,
-            parse_mode=ParseMode.MARKDOWN,
-        )
-
-        context.bot.send_message(
-            chat_id=chat_id,
-            text='Ваш результат: 1/4. Тест не сдан 😢',
-            reply_markup=get_return(),
         )
 
     elif data == CALLBACK_BUTTON_HIDE_KEYBOARD:
@@ -395,20 +280,17 @@ def keyboard_callback_handler(update: Update, context: CallbackContext):
 def do_start(update: Update, context: CallbackContext):
     update.message.reply_text(
         text="Привет! Я бот для тестирования\nНажмите /help для вызова помощи."
-             "\nИли /tests для вывода списка тестов.",
+             "\nНажмите /tests для вывода списка тестов.",
     )
 
 
 # Начало теста
 @log_errors
 def do_tests(update: Update, context: CallbackContext):
+    tests_titles = [test.title for test in Test.objects.all()]
+    titles = ' '.join(tests_titles)
     update.message.reply_text(
-        text="Доступные тесты: "
-             "\n 1. Количественные параметры информационных объектов"
-             "\n 2. Значение логического выражения"
-             "\n 3. Файловая система организации данных"
-             "\n 4. Программа с условным оператором"
-             "\n 5. Формальные описания реальных объектов и процессов",
+        text="Доступные тесты: " + titles,
         reply_markup=get_test_inline_keyboard(),
     )
 

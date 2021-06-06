@@ -130,4 +130,4 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Настроики бота
-TOKEN='1863697388:AAEMQXOSMDipBvPxQw-qkypeZVHqwnxijgs'
+TOKEN='1606190993:AAEjvldi249-MKI4OyYilAPW8KKkKXh3Vyo'
